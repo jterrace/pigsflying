@@ -1,88 +1,161 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
+<title>Flying Pigs</title>
 
-  <title>jterrace/pigsflying @ GitHub</title>
+<script type="text/javascript" src="js/Three.js"></script>
+<script type="text/javascript" src="js/Stats.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #b12a8e;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+<style>
+body {
+  background: #000000;
+}
+</style>
+
+<script type="text/javascript">
+    var camera, scene, renderer;
+    var geometry, material;
+    var piggyBank, piggyMaterial;
+    var NUM_PIGS = 50;
+    var pigs = new Array(NUM_PIGS);
+    var rotationsX = new Array(NUM_PIGS);
+    var rotationsY = new Array(NUM_PIGS);
+    var rotationsZ = new Array(NUM_PIGS);
+    var positionsX = new Array(NUM_PIGS);
+    var positionsY = new Array(NUM_PIGS);
+    var positionsZ = new Array(NUM_PIGS);
+    
+    function makePiggy(x, y, z, sx, sy, sz) {
+        var piggy = new THREE.Mesh( piggyBank, new THREE.MeshFaceMaterial() );
+        piggy.position.set( x, y, z );
+        piggy.scale.set( sx, sy, sz );
+        return piggy;
     }
-    #container {
-      margin: 0 auto;
-      width: 700px;
+     
+    function init() {
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 1000;
+        scene.add( camera );
+
+        scene.add( new THREE.AmbientLight( 0xdddddd ) );
+
+        var directionalLight = new THREE.DirectionalLight( 0xbbbbbb );
+        directionalLight.position.x = -0.2;
+        directionalLight.position.y = -0.2;
+        directionalLight.position.z = -0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = 0.2;
+        directionalLight.position.y = 0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = -0.2;
+        directionalLight.position.y = 0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = 0.2;
+        directionalLight.position.y = -0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        for (var i=0; i<NUM_PIGS; i++) {
+            pig = makePiggy(Math.random() * 600 - 3200,
+                            Math.random() * 600 + 2000,
+                            Math.random() * 2000 * -1,
+                            1,
+                            1,
+                            1);
+      
+            rotationsX[i] = Math.random() * 0.1 - 0.05;
+            rotationsY[i] = Math.random() * 0.1 - 0.05;
+            rotationsZ[i] = Math.random() * 0.1 - 0.05;
+            
+            positionsX[i] = Math.random() * 20;
+            positionsY[i] = Math.random() * 20 * -1;
+            positionsZ[i] = Math.random() * 5;
+            
+            pigs[i] = pig;
+            scene.add(pig);
+        }
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+        container.appendChild( renderer.domElement );
+        
+        /*var stats = new Stats();
+
+        // Align top-left
+        stats.getDomElement().style.position = 'absolute';
+        stats.getDomElement().style.left = '0px';
+        stats.getDomElement().style.top = '0px';
+        
+        document.body.appendChild( stats.getDomElement() );
+        
+        setInterval( function () {
+        
+           stats.update();
+        
+        }, 1000 / 60 );*/
     }
-    h1 { font-size: 3.8em; color: #4ed571; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #4ed571; }
-    h3 { text-align: center; color: #4ed571; }
-    a { color: #4ed571; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+
+    function animate() {
+        requestAnimationFrame( animate );
+        render();
+    }
+
+    function render() {
+        for (var i=0; i<NUM_PIGS; i++) {
+            pigs[i].rotation.x += rotationsX[i];
+            pigs[i].rotation.y += rotationsY[i];
+            pigs[i].rotation.z += rotationsZ[i];
+            pigs[i].position.x += positionsX[i];
+            pigs[i].position.y += positionsY[i];
+            pigs[i].position.z += positionsZ[i];
+            
+            if (pigs[i].position.x > 1500 || pigs[i].position.y < -1500 || pigs[i].position.z > 1000) {
+                pigs[i].position.x = Math.random() * 600 - 3200;
+                pigs[i].position.y = Math.random() * 600 + 2000,
+                pigs[i].position.z = Math.random() * 2000 * -1;
+            }
+            
+        }
+        renderer.render( scene, camera );
+    }
+
+    $(document).ready(function() {
+        
+      var loader = new THREE.JSONLoader(),
+      callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
+      callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
+      
+      loader.load( "models/PiggyBank.js", function( geometry ) {
+          piggyBank = geometry;
+          init();
+          animate();
+      });
+        
+    });
+    
+</script>
+
 </head>
 
 <body>
-  <a href="https://github.com/jterrace/pigsflying"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
-  <div id="container">
-
-    <div class="download">
-      <a href="https://github.com/jterrace/pigsflying/zipball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/zip.png"></a>
-      <a href="https://github.com/jterrace/pigsflying/tarball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="https://github.com/jterrace/pigsflying">pigsflying</a>
-      <span class="small">by <a href="https://github.com/jterrace">jterrace</a></span></h1>
-
-    <div class="description">
-      A port of the old mac screensaver "Flying Pigs" - featuring "catcha.mid" - to WebGL
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-      <h2>Authors</h2>
-      <p>Jeff Terrace (jterrace@gmail.com)<br/>      </p>
-    
-
-    
-      <h2>Contact</h2>
-      <p>Jeff Terrace (jterrace@gmail.com)<br/>      </p>
-    
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="https://github.com/jterrace/pigsflying/zipball/master">zip</a> or
-      <a href="https://github.com/jterrace/pigsflying/tarball/master">tar formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/jterrace/pigsflying</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="https://github.com/jterrace/pigsflying">jterrace/pigsflying</a>
-    </div>
-
-  </div>
-
+<embed src="audio/catcha.mid" hidden="true" border="0" width="0" height="0" autostart="true" autoplay="true" loop="true" volume="100%">
 </body>
+
 </html>
