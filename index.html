@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>Flying Pigs</title>
+
+<script type="text/javascript" src="js/Three.js"></script>
+<script type="text/javascript" src="js/Stats.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+
+<style>
+body {
+  background: #000000;
+}
+</style>
+
+<script type="text/javascript">
+    var camera, scene, renderer;
+    var geometry, material;
+    var piggyBank, piggyMaterial;
+    var NUM_PIGS = 50;
+    var pigs = new Array(NUM_PIGS);
+    var rotationsX = new Array(NUM_PIGS);
+    var rotationsY = new Array(NUM_PIGS);
+    var rotationsZ = new Array(NUM_PIGS);
+    var positionsX = new Array(NUM_PIGS);
+    var positionsY = new Array(NUM_PIGS);
+    var positionsZ = new Array(NUM_PIGS);
+    
+    function makePiggy(x, y, z, sx, sy, sz) {
+        var piggy = new THREE.Mesh( piggyBank, new THREE.MeshFaceMaterial() );
+        piggy.position.set( x, y, z );
+        piggy.scale.set( sx, sy, sz );
+        return piggy;
+    }
+     
+    function init() {
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 1000;
+        scene.add( camera );
+
+        scene.add( new THREE.AmbientLight( 0xdddddd ) );
+
+        var directionalLight = new THREE.DirectionalLight( 0xbbbbbb );
+        directionalLight.position.x = -0.2;
+        directionalLight.position.y = -0.2;
+        directionalLight.position.z = -0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = 0.2;
+        directionalLight.position.y = 0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = -0.2;
+        directionalLight.position.y = 0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        var directionalLight = new THREE.DirectionalLight( 0xaaaaaa );
+        directionalLight.position.x = 0.2;
+        directionalLight.position.y = -0.2;
+        directionalLight.position.z = 0.2;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+        
+        for (var i=0; i<NUM_PIGS; i++) {
+            pig = makePiggy(Math.random() * 600 - 3200,
+                            Math.random() * 600 + 2000,
+                            Math.random() * 2000 * -1,
+                            1,
+                            1,
+                            1);
+      
+            rotationsX[i] = Math.random() * 0.1 - 0.05;
+            rotationsY[i] = Math.random() * 0.1 - 0.05;
+            rotationsZ[i] = Math.random() * 0.1 - 0.05;
+            
+            positionsX[i] = Math.random() * 20;
+            positionsY[i] = Math.random() * 20 * -1;
+            positionsZ[i] = Math.random() * 5;
+            
+            pigs[i] = pig;
+            scene.add(pig);
+        }
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+        container.appendChild( renderer.domElement );
+        
+        /*var stats = new Stats();
+
+        // Align top-left
+        stats.getDomElement().style.position = 'absolute';
+        stats.getDomElement().style.left = '0px';
+        stats.getDomElement().style.top = '0px';
+        
+        document.body.appendChild( stats.getDomElement() );
+        
+        setInterval( function () {
+        
+           stats.update();
+        
+        }, 1000 / 60 );*/
+    }
+
+    function animate() {
+        requestAnimationFrame( animate );
+        render();
+    }
+
+    function render() {
+        for (var i=0; i<NUM_PIGS; i++) {
+            pigs[i].rotation.x += rotationsX[i];
+            pigs[i].rotation.y += rotationsY[i];
+            pigs[i].rotation.z += rotationsZ[i];
+            pigs[i].position.x += positionsX[i];
+            pigs[i].position.y += positionsY[i];
+            pigs[i].position.z += positionsZ[i];
+            
+            if (pigs[i].position.x > 1500 || pigs[i].position.y < -1500 || pigs[i].position.z > 1000) {
+                pigs[i].position.x = Math.random() * 600 - 3200;
+                pigs[i].position.y = Math.random() * 600 + 2000,
+                pigs[i].position.z = Math.random() * 2000 * -1;
+            }
+            
+        }
+        renderer.render( scene, camera );
+    }
+
+    $(document).ready(function() {
+        
+      var loader = new THREE.JSONLoader(),
+      callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
+      callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
+      
+      loader.load( "models/PiggyBank.js", function( geometry ) {
+          piggyBank = geometry;
+          init();
+          animate();
+      });
+        
+    });
+    
+</script>
+
+</head>
+
+<body>
+<embed src="audio/catcha.mid" hidden="true" border="0" width="0" height="0" autostart="true" autoplay="true" loop="true" volume="100%">
+</body>
+
+</html>
